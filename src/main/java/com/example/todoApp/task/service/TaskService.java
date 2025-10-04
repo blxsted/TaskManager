@@ -3,13 +3,16 @@ package com.example.todoApp.task.service;
 import com.example.todoApp.task.model.dto.TaskCreateRequest;
 import com.example.todoApp.task.model.dto.TaskResponse;
 
-public interface TaskService {
+import java.util.List;
 
+public interface TaskService {
 
     TaskResponse createTask(TaskCreateRequest task);
 
-    void updateTask(TaskCreateRequest task);
+    List<TaskResponse> getAllTasks();
 
-    void deleteTask();
+    TaskResponse updateTask(TaskCreateRequest task, Long id);
+
+    void deleteTask(Long taskId);
 
 }
