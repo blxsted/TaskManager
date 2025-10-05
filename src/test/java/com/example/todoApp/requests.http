@@ -1,0 +1,41 @@
+###
+POST http://localhost:8080/tasks
+Content-Type: application/json
+
+{
+  "title": "Test2",
+  "description": "langer Text",
+  "priority": "LOW",
+  "dueDate": "2025-11-11T12:00:00"
+}
+
+###
+GET http://localhost:8080/tasks
+Content-Type: application/json
+
+
+###
+@id = 3
+GET http://localhost:8080/tasks/{{id}}
+
+
+###
+PUT http://localhost:8080/tasks/{{id}}
+Content-Type: application/json
+
+{
+  "title": "geänderter TEXT",
+  "description": "kurzer Text",
+  "priority": "MEDIUM",
+  "dueDate": ""
+}
+
+
+###
+DELETE http://localhost:8080/tasks/{{id}}
+Content-Type: application/json
+
+
+
+###
+GET http://localhost:8080/tasks?status=OPEN&priority=HIGH&dueDate=2025-11-11T12:00:00

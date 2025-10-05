@@ -1,6 +1,7 @@
 package com.example.todoApp.task.service.impl;
 
 import com.example.todoApp.task.model.TaskEntity;
+import com.example.todoApp.task.model.TaskPriority;
 import com.example.todoApp.task.model.TaskStatus;
 import com.example.todoApp.task.model.dto.TaskCreateRequest;
 import com.example.todoApp.task.model.dto.TaskResponse;
@@ -10,8 +11,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -32,38 +33,8 @@ public class TaskServiceImpl implements TaskService {
 
         TaskEntity saved = taskRepository.save(taskEntity);
 
-        return new TaskResponse(
-                saved.getId(),
-                saved.getTitle(),
-                saved.getDescription(),
-                saved.getStatus(),
-                saved.getPriority(),
-                saved.getDueDate(),
-                saved.getCreatedAt(),
-                saved.getUpdatedAt()
-                );
-
+        return mapToTaskResponse(saved);
     }
-
-    @Override
-    public List<TaskResponse> getAllTasks() {
-        List<TaskEntity> tasks = taskRepository.findAll();
-
-        return tasks.stream()
-                .map(task -> new TaskResponse(
-                        task.getId(),
-                        task.getTitle(),
-                        task.getDescription(),
-                        task.getStatus(),
-                        task.getPriority(),
-                        task.getDueDate(),
-                        task.getCreatedAt(),
-                        task.getUpdatedAt()
-                ))
-                .collect(Collectors.toList());
-
-    }
-
 
     @Override
     @Transactional
@@ -78,16 +49,7 @@ public class TaskServiceImpl implements TaskService {
 
         taskRepository.save(task);
 
-        return new TaskResponse(
-                task.getId(),
-                task.getTitle(),
-                task.getDescription(),
-                task.getStatus(),
-                task.getPriority(),
-                task.getDueDate(),
-                task.getCreatedAt(),
-                task.getUpdatedAt()
-        );
+        return mapToTaskResponse(task);
     }
 
     @Override
@@ -98,6 +60,52 @@ public class TaskServiceImpl implements TaskService {
         } else {
             throw new RuntimeException("Task not found with id " + taskId);
         }
+    }
+
+    @Override
+    public List<TaskResponse> getTasks(TaskStatus status, TaskPriority priority, LocalDateTime dueDate) {
+        List<TaskEntity> tasks;
+
+        if (status != null && priority != null) {
+            tasks = taskRepository.findByStatusAndPriority(status, priority);
+
+        } else if (status != null) {
+            tasks = taskRepository.findByStatus(status);
+
+        } else if (priority != null) {
+            tasks = taskRepository.findByPriority(priority);
+
+        } else {
+            tasks = taskRepository.findAll();
+        }
+
+        if (dueDate != null) {
+            tasks = tasks.stream()
+                    .filter(x -> x.getDueDate().isBefore(dueDate))
+                    .toList();
+        }
+
+        return tasks.stream().map(this::mapToTaskResponse).toList();
+    }
+
+    @Override
+    public TaskResponse getTaskById(Long id) {
+        TaskEntity task = taskRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Task not found with id " + id));
+        return mapToTaskResponse(task);
+    }
+
+    private TaskResponse mapToTaskResponse(TaskEntity taskEntity){
+        return new TaskResponse (
+                taskEntity.getId(),
+                taskEntity.getTitle(),
+                taskEntity.getDescription(),
+                taskEntity.getStatus(),
+                taskEntity.getPriority(),
+                taskEntity.getDueDate(),
+                taskEntity.getCreatedAt(),
+                taskEntity.getUpdatedAt()
+        );
     }
 
 }
