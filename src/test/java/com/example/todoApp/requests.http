@@ -3,7 +3,7 @@ POST http://localhost:8080/tasks
 Content-Type: application/json
 
 {
-  "title": "Test2",
+  "title": "Docker",
   "description": "langer Text",
   "priority": "LOW",
   "dueDate": "2025-11-11T12:00:00"
@@ -15,7 +15,7 @@ Content-Type: application/json
 
 
 ###
-@id = 3
+@id = 52
 GET http://localhost:8080/tasks/{{id}}
 
 
