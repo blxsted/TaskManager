@@ -1,0 +1,36 @@
+name: CI/CD TODO APP
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-test-docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Code aus Git ziehen
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. Java 21 installieren
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 21
+
+      # 3. Maven Build + Tests
+      - name: Build with Maven
+        run: mvn clean package
+
+      # 4. Docker Build
+      - name: Build Docker image
+        run: docker build -t todo-app .
+
+      # 5. (Optional) Docker Run lokal auf CI Agent
+      - name: Run Docker container
+        run: docker run -d -p 8080:8080 todo-app
